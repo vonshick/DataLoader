@@ -44,6 +44,7 @@
     </ATTRIBUTE>
     <ATTRIBUTE AttrID="Attr0">
       <NAME Value="Name" />
+      <ROLE Value="Name" />
       <DESCRIPTION Value="Names of alternatives" />
       <TYPE Value="String" />
     </ATTRIBUTE>

@@ -15,19 +15,19 @@ namespace DataImportApp
 
         public void LoadCSV()
         {
+            CriterionList = new List<Criterion>();
+            AlternativeList = new List<Alternative>();
+
             string file = "Lab7_bus.csv";
             using (var reader = new StreamReader(@file))
             {
                 string[] criterionTypeArray = reader.ReadLine().Split(';');
                 string[] criterionNamesArray = reader.ReadLine().Split(';');
-                CriterionList = new List<Criterion>();
                 // iterating from 1 because first column is empty
                 for (int i = 1; i < criterionTypeArray.Length; i++)
                 {
                     CriterionList.Add(new Criterion(criterionNamesArray[i], criterionTypeArray[i]));
                 }
-
-                AlternativeList = new List<Alternative>();
 
                 while (!reader.EndOfStream)
                 {
@@ -52,19 +52,19 @@ namespace DataImportApp
         public void LoadXML()
         {
             CriterionList = new List<Criterion>();
+            AlternativeList = new List<Alternative>();
 
             //load XML
             string file = "sample.xml";
             XmlDocument xmlDoc = new XmlDocument();
             xmlDoc.Load(@file);
 
+            string nameAttributeId = "";
+            string descriptionAttributeId = "";
+
             // iterate on its nodes
             foreach (XmlNode xmlNode in xmlDoc.DocumentElement.ChildNodes)
             {
-                Criterion criterion = new Criterion();
-                string nameAttributeId = "";
-                string descriptionAttributeId = "";
-
                 // first group of nodes are attributes
                 // second - Electre meta data
                 // third - objects
@@ -72,7 +72,7 @@ namespace DataImportApp
                 {
                     foreach (XmlNode attribute in xmlNode)
                     {
-                        criterion.ID = attribute.Attributes["AttrID"].Value;
+                        Criterion criterion = new Criterion() { ID = attribute.Attributes["AttrID"].Value };
                         // two specific groups of nodes may appear in attributes - name and description
                         // we don't want to save it as criterion
                         bool saveCriterion = true;
@@ -97,7 +97,8 @@ namespace DataImportApp
                                     {
                                         saveCriterion = false;
                                         nameAttributeId = criterion.ID;
-                                    } else if (value == "Description")
+                                    }
+                                    else if (value == "Description")
                                     {
                                         saveCriterion = false;
                                         descriptionAttributeId = criterion.ID;
@@ -106,6 +107,7 @@ namespace DataImportApp
                                     {
                                         saveCriterion = true;
                                     }
+
                                     break;
                                 case "TYPE":
                                     break;
@@ -114,16 +116,41 @@ namespace DataImportApp
                                     return;
                             }
                         }
+
                         if (saveCriterion)
                         {
                             CriterionList.Add(criterion);
                         }
                     }
-                } else if (xmlNode.Name == "OBJECTS")
+                }
+                else if (xmlNode.Name == "OBJECTS")
                 {
-                    foreach(XmlNode object in xmlNode)
+                    foreach (XmlNode instance in xmlNode)
                     {
-                        
+
+                        Alternative alternative = new Alternative();
+                        Dictionary<string, float> criteriaValuesDictionary = new Dictionary<string, float>();
+
+                        foreach (XmlNode instancePart in instance)
+                        {
+                            var value = instancePart.Attributes["Value"].Value;
+                            var attributeID = instancePart.Attributes["AttrID"].Value;
+                            
+                            if (attributeID == descriptionAttributeId)
+                            {
+                                alternative.Description = value;
+                            } else if (attributeID == nameAttributeId)
+                            {
+                                alternative.Name = value;
+                            } else
+                            {
+                                Criterion criterion = CriterionList.Find(element => element.ID == attributeID);
+                                criteriaValuesDictionary.Add(criterion.Name, Convert.ToSingle(value));
+                            }
+                        }
+
+                        alternative.CriteriaValues = criteriaValuesDictionary;
+                        AlternativeList.Add(alternative);
                     }
                 }
             }
