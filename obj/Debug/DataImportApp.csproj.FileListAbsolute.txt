@@ -1,0 +1,6 @@
+C:\Users\Kuba\source\repos\DataImportApp\DataImportApp\bin\Debug\DataImportApp.exe.config
+C:\Users\Kuba\source\repos\DataImportApp\DataImportApp\bin\Debug\DataImportApp.exe
+C:\Users\Kuba\source\repos\DataImportApp\DataImportApp\bin\Debug\DataImportApp.pdb
+C:\Users\Kuba\source\repos\DataImportApp\DataImportApp\obj\Debug\DataImportApp.csprojAssemblyReference.cache
+C:\Users\Kuba\source\repos\DataImportApp\DataImportApp\obj\Debug\DataImportApp.exe
+C:\Users\Kuba\source\repos\DataImportApp\DataImportApp\obj\Debug\DataImportApp.pdb
