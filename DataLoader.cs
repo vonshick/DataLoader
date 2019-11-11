@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.CodeDom;
 using System.Collections.Generic;
 using System.Globalization;
@@ -11,8 +11,8 @@ namespace DataImportApp
 {
     public class DataLoader
     {
-        private List<Criterion> CriterionList { get; set; }
-        private List<Alternative> AlternativeList { get; set; }
+        public List<Criterion> CriterionList { get; set; }
+        public List<Alternative> AlternativeList { get; set; }
 
         public void LoadCSV(string filePath)
         {
@@ -23,6 +23,7 @@ namespace DataImportApp
             {
                 string[] criterionTypeArray = reader.ReadLine().Split(';');
                 string[] criterionNamesArray = reader.ReadLine().Split(';');
+                
                 // iterating from 1 because first column is empty
                 for (int i = 1; i < criterionTypeArray.Length; i++)
                 {
@@ -33,18 +34,15 @@ namespace DataImportApp
                 {
                     var values = reader.ReadLine().Split(';');
                     Alternative alternative = new Alternative {Name = values[0]};
-
                     Dictionary<string, float> criterionValueDictionary = new Dictionary<string, float>();
+
                     for (int i = 1; i < values.Length; i++)
                     {
-                        Console.WriteLine(criterionNamesArray[i] + " : " + values[i]);
-                        criterionValueDictionary.Add(criterionNamesArray[i], Convert.ToSingle(values[i]));
+                        criterionValueDictionary.Add(criterionNamesArray[i], float.Parse(values[i], CultureInfo.InvariantCulture));
                     }
 
                     alternative.CriteriaValues = criterionValueDictionary;
                     AlternativeList.Add(alternative);
-
-                    Console.WriteLine("");
                 }
             }
         }
@@ -144,7 +142,7 @@ namespace DataImportApp
                             } else
                             {
                                 Criterion criterion = CriterionList.Find(element => element.ID == attributeID);
-                                criteriaValuesDictionary.Add(criterion.Name, Convert.ToSingle(value));
+                                criteriaValuesDictionary.Add(criterion.Name, float.Parse(value, CultureInfo.InvariantCulture));
                             }
                         }
 
@@ -217,7 +215,7 @@ namespace DataImportApp
                 {
                     foreach (XmlNode instance in xmlNode)
                     {
-                        Alternative alternative = new Alternative();
+                        Alternative alternative = new Alternative() {Name = instance.Attributes["ObjID"].Value};
                         Dictionary<string, float> criteriaValuesDictionary = new Dictionary<string, float>();
 
                         foreach (XmlNode instancePart in instance)
@@ -240,6 +238,31 @@ namespace DataImportApp
                         AlternativeList.Add(alternative);
                     }
                 }
+            }
+        }
+
+        public void setMinAndMaxCriterionValues()
+        {
+            for (int i = 0; i < CriterionList.Count; i++)
+            {
+                float min = 0, max = 0;
+                string criterionName = CriterionList[i].Name;
+
+                for (int j = 0; j < AlternativeList.Count; j++)
+                {
+                    float value = AlternativeList[j].CriteriaValues[criterionName];
+
+                    if (value < min)
+                    {
+                        min = value;
+                    }
+                    if (value > max)
+                    {
+                        max = value;
+                    }
+                }
+                CriterionList[i].MaxValue = max;
+                CriterionList[i].MinValue = min;
             }
         }
     }
