@@ -21,13 +21,13 @@ namespace DataImportApp
 
             using (var reader = new StreamReader(filePath))
             {
-                string[] criterionTypeArray = reader.ReadLine().Split(';');
+                string[] criterionDirectionsArray = reader.ReadLine().Split(';');
                 string[] criterionNamesArray = reader.ReadLine().Split(';');
                 
                 // iterating from 1 because first column is empty
-                for (int i = 1; i < criterionTypeArray.Length; i++)
+                for (int i = 1; i < criterionDirectionsArray.Length; i++)
                 {
-                    CriterionList.Add(new Criterion(criterionNamesArray[i], criterionTypeArray[i]));
+                    CriterionList.Add(new Criterion(criterionNamesArray[i], criterionDirectionsArray[i]));
                 }
 
                 while (!reader.EndOfStream)
@@ -87,7 +87,7 @@ namespace DataImportApp
                                     criterion.Description = value;
                                     break;
                                 case "CRITERION":
-                                    criterion.CriterionType = value == "Cost" ? "c" : "g";
+                                    criterion.CriterionDirection = value == "Cost" ? "c" : "g";
                                     break;
                                 case "ROLE":
                                     if (value == "Name")
@@ -184,7 +184,7 @@ namespace DataImportApp
                                     criterion.Description = value;
                                     break;
                                 case "CRITERION":
-                                    criterion.CriterionType = value == "Cost" ? "c" : "g";
+                                    criterion.CriterionDirection = value == "Cost" ? "c" : "g";
                                     break;
                                 case "ROLE":
                                     if (value == "Description")
