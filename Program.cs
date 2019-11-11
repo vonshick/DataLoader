@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Runtime.InteropServices;
 using System.Security.AccessControl;
 
@@ -36,7 +37,7 @@ namespace DataImportApp
             
 
             XMCDALoader xmcdaLoader = new XMCDALoader();
-            xmcdaLoader.loadXMCDA("xmcda");
+            xmcdaLoader.loadXMCDA(Path.Combine(Environment.CurrentDirectory, "xmcda"));
 
             Console.WriteLine("Criteria:");
             for (int i = 0; i < xmcdaLoader.CriterionList.Count; i++)

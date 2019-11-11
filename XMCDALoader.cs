@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Globalization;
+using System.IO;
 using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
@@ -20,7 +21,7 @@ namespace DataImportApp
         private void loadCriteria()
         {
             XmlDocument xmlDocument = new XmlDocument();
-            xmlDocument.Load(XMCDADirectory + "/criteria.xml");
+            xmlDocument.Load(Path.Combine(XMCDADirectory, "criteria.xml"));
 
             // this file contains only one main block - <criteria>
             foreach (XmlNode xmlNode in xmlDocument.DocumentElement.ChildNodes[0])
@@ -38,7 +39,7 @@ namespace DataImportApp
         private void loadCriteriaScales()
         {
             XmlDocument xmlDocument = new XmlDocument();
-            xmlDocument.Load(XMCDADirectory + "/criteria_scales.xml");
+            xmlDocument.Load(Path.Combine(XMCDADirectory, "criteria_scales.xml"));
 
             // this file contains only one main block - <criteriaScales>
             foreach (XmlNode xmlNode in xmlDocument.DocumentElement.ChildNodes[0])
@@ -69,7 +70,7 @@ namespace DataImportApp
         private void loadPerformanceTable()
         {
             XmlDocument xmlDocument = new XmlDocument();
-            xmlDocument.Load(XMCDADirectory + "/performance_table.xml");
+            xmlDocument.Load(Path.Combine(XMCDADirectory, "performance_table.xml"));
 
             // this file contains only one main block - <criteriaScales>
             foreach (XmlNode xmlNode in xmlDocument.DocumentElement.ChildNodes[0])
