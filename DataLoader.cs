@@ -1,6 +1,7 @@
 ﻿using System;
 using System.CodeDom;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Xml;
 using System.Text;
@@ -13,13 +14,12 @@ namespace DataImportApp
         private List<Criterion> CriterionList { get; set; }
         private List<Alternative> AlternativeList { get; set; }
 
-        public void LoadCSV()
+        public void LoadCSV(string filePath)
         {
             CriterionList = new List<Criterion>();
             AlternativeList = new List<Alternative>();
 
-            string file = "Lab7_bus.csv";
-            using (var reader = new StreamReader(@file))
+            using (var reader = new StreamReader(filePath))
             {
                 string[] criterionTypeArray = reader.ReadLine().Split(';');
                 string[] criterionNamesArray = reader.ReadLine().Split(';');
@@ -49,15 +49,14 @@ namespace DataImportApp
             }
         }
 
-        public void LoadXML()
+        public void LoadXML(string filePath)
         {
             CriterionList = new List<Criterion>();
             AlternativeList = new List<Alternative>();
 
             //load XML
-            string file = "sample.xml";
             XmlDocument xmlDoc = new XmlDocument();
-            xmlDoc.Load(@file);
+            xmlDoc.Load(filePath);
 
             string nameAttributeId = "";
             string descriptionAttributeId = "";
@@ -146,6 +145,94 @@ namespace DataImportApp
                             {
                                 Criterion criterion = CriterionList.Find(element => element.ID == attributeID);
                                 criteriaValuesDictionary.Add(criterion.Name, Convert.ToSingle(value));
+                            }
+                        }
+
+                        alternative.CriteriaValues = criteriaValuesDictionary;
+                        AlternativeList.Add(alternative);
+                    }
+                }
+            }
+        }
+
+        public void LoadUTX(string filePath)
+        {
+            CriterionList = new List<Criterion>();
+            AlternativeList = new List<Alternative>();
+
+            //load XML
+            XmlDocument xmlDoc = new XmlDocument();
+            xmlDoc.Load(@filePath);
+
+            string descriptionAttributeName = "";
+
+            // iterate on its nodes
+            foreach (XmlNode xmlNode in xmlDoc.DocumentElement.ChildNodes)
+            {
+                if (xmlNode.Name == "ATTRIBUTES")
+                {
+                    foreach (XmlNode attribute in xmlNode)
+                    {
+                        Criterion criterion = new Criterion() { Name = attribute.Attributes["AttrID"].Value };
+                        bool saveCriterion = true;
+
+                        foreach (XmlNode attributePart in attribute)
+                        {
+                            var value = attributePart.Attributes["Value"].Value;
+
+                            switch (attributePart.Name)
+                            {
+                                case "DESCRIPTION":
+                                    criterion.Description = value;
+                                    break;
+                                case "CRITERION":
+                                    criterion.CriterionType = value == "Cost" ? "c" : "g";
+                                    break;
+                                case "ROLE":
+                                    if (value == "Description")
+                                    {
+                                        saveCriterion = false;
+                                        descriptionAttributeName = criterion.Name;
+                                    }
+                                    else
+                                    {
+                                        saveCriterion = true;
+                                    }
+                                    break;
+                                case "TYPE":
+                                    break;
+                                default:
+                                    Console.WriteLine("Improper XML structure");
+                                    return;
+                            }
+                        }
+
+                        if (saveCriterion)
+                        {
+                            CriterionList.Add(criterion);
+                        }
+                    }
+                }
+                else if (xmlNode.Name == "OBJECTS")
+                {
+                    foreach (XmlNode instance in xmlNode)
+                    {
+                        Alternative alternative = new Alternative();
+                        Dictionary<string, float> criteriaValuesDictionary = new Dictionary<string, float>();
+
+                        foreach (XmlNode instancePart in instance)
+                        {
+                            var value = instancePart.Attributes["Value"].Value;
+                            var attributeName = instancePart.Attributes["AttrID"].Value;
+
+                            if (attributeName == descriptionAttributeName)
+                            {
+                                alternative.Description = value;
+                            }
+                            else
+                            {
+                                Criterion criterion = CriterionList.Find(element => element.Name == attributeName);
+                                criteriaValuesDictionary.Add(criterion.Name, float.Parse(value, CultureInfo.InvariantCulture));
                             }
                         }
 

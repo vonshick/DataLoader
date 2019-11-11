@@ -7,8 +7,9 @@ namespace DataImportApp
         static void Main()
         {
             DataLoader dataLoader = new DataLoader();
-//            dataLoader.LoadCSV();
-            dataLoader.LoadXML();
+            //            dataLoader.LoadCSV("Lab7_bus.csv");
+            //            dataLoader.LoadXML("sample.xml");
+            dataLoader.LoadUTX("sample.utx");
             Console.ReadKey();
         }
 
